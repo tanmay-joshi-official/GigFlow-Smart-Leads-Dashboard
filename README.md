@@ -81,7 +81,11 @@ GigFlow/
 ### Running with Docker
 
 ```bash
+# If you have Docker Compose V1
 docker-compose up --build
+
+# If you have Docker Compose V2 (Recommended)
+docker compose up --build
 ```
 
 ## API Endpoints
