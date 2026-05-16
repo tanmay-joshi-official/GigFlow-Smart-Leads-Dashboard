@@ -57,8 +57,9 @@ export const getLeads = async (req: AuthRequest, res: Response) => {
         limit,
       },
     });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    console.error('Get Leads Error:', error);
+    res.status(500).json({ message: error.message || 'Server error fetching leads' });
   }
 };
 
@@ -74,8 +75,9 @@ export const getLeadById = async (req: AuthRequest, res: Response) => {
     } else {
       res.status(404).json({ message: 'Lead not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    console.error('Get Lead Error:', error);
+    res.status(500).json({ message: error.message || 'Server error fetching lead' });
   }
 };
 
@@ -142,7 +144,8 @@ export const deleteLead = async (req: AuthRequest, res: Response) => {
     } else {
       res.status(404).json({ message: 'Lead not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    console.error('Delete Lead Error:', error);
+    res.status(500).json({ message: error.message || 'Server error deleting lead' });
   }
 };

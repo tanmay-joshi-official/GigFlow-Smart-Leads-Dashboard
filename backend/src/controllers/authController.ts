@@ -33,8 +33,9 @@ export const register = async (req: Request, res: Response) => {
     } else {
       res.status(400).json({ message: 'Invalid user data' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    console.error('Register Error:', error);
+    res.status(500).json({ message: error.message || 'Server error during registration' });
   }
 };
 
@@ -58,8 +59,9 @@ export const login = async (req: Request, res: Response) => {
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    console.error('Login Error:', error);
+    res.status(500).json({ message: error.message || 'Server error during login' });
   }
 };
 

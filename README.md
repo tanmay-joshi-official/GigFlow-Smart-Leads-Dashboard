@@ -78,7 +78,9 @@ GigFlow/
    npm run dev
    ```
 
-### Running with Docker
+### Running with Docker (Optional)
+
+> **Note**: You must have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running on your machine for these commands to work. If you see `docker: command not found`, please use the **Local Installation** steps below.
 
 ```bash
 # If you have Docker Compose V1
@@ -87,6 +89,23 @@ docker-compose up --build
 # If you have Docker Compose V2 (Recommended)
 docker compose up --build
 ```
+
+### Local Installation (Recommended if Docker is not installed)
+
+1. **MongoDB**: Ensure you have MongoDB installed locally or use a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) connection string.
+2. **Backend**:
+   ```bash
+   cd backend
+   npm install
+   # Create/update .env file with your MONGODB_URI
+   npm run dev
+   ```
+3. **Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
 ## API Endpoints
 
