@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Users, LogOut, Menu, X } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  LogOut, 
+  Menu, 
+  X,
+  ChevronLeft,
+  ChevronRight,
+  User as UserIcon
+} from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleLogout = () => {
     logout();
@@ -19,72 +33,105 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-slate-50 flex font-sans">
       {/* Sidebar */}
-      <div
-        className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-white shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col`}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 transition-all duration-300 ease-in-out flex flex-col shadow-sm",
+          isSidebarOpen ? "w-64" : "w-20"
+        )}
       >
-        <div className="p-4 flex items-center justify-between border-b">
-          {isSidebarOpen && <span className="text-xl font-bold text-indigo-600">GigFlow</span>}
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1 rounded hover:bg-gray-100"
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+        <div className="h-16 flex items-center px-6 border-b border-slate-100">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-indigo-200">
+              <LayoutDashboard className="text-white" size={18} />
+            </div>
+            {isSidebarOpen && (
+              <span className="text-lg font-bold tracking-tight text-slate-900 truncate">
+                GigFlow
+              </span>
+            )}
+          </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group",
                 location.pathname === item.path
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
+                  ? "bg-indigo-50 text-indigo-700 font-medium shadow-sm ring-1 ring-indigo-100"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              )}
             >
-              <item.icon size={20} />
-              {isSidebarOpen && <span>{item.name}</span>}
+              <item.icon size={20} className={cn(
+                "flex-shrink-0 transition-colors",
+                location.pathname === item.path ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600"
+              )} />
+              {isSidebarOpen && <span className="truncate">{item.name}</span>}
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+        <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+          <div className="flex items-center gap-3 px-2 py-3">
+            <div className="w-10 h-10 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-indigo-700 font-bold shadow-sm flex-shrink-0">
               {user?.name.charAt(0)}
             </div>
             {isSidebarOpen && (
-              <div className="overflow-hidden">
-                <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.role}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-slate-900 truncate">{user?.name}</p>
+                <p className="text-xs text-slate-500 font-medium truncate uppercase tracking-wider">{user?.role}</p>
               </div>
             )}
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-3 w-full p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className={cn(
+              "mt-2 flex items-center gap-3 w-full px-3 py-2 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-200 group",
+              !isSidebarOpen && "justify-center"
+            )}
           >
-            <LogOut size={20} />
-            {isSidebarOpen && <span>Logout</span>}
+            <LogOut size={20} className="text-slate-400 group-hover:text-red-500" />
+            {isSidebarOpen && <span className="font-medium">Logout</span>}
           </button>
         </div>
-      </div>
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="absolute -right-3 top-20 bg-white border border-slate-200 rounded-full p-1 shadow-sm hover:bg-slate-50 transition-colors hidden md:block"
+        >
+          {isSidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="bg-white shadow-sm p-4 md:hidden flex items-center justify-between">
-          <span className="text-xl font-bold text-indigo-600">GigFlow</span>
-          <button className="p-1 rounded hover:bg-gray-100">
-            <Menu size={24} />
-          </button>
+      <div className={cn(
+        "flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out",
+        isSidebarOpen ? "md:pl-64" : "md:pl-20"
+      )}>
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-40">
+          <div className="flex items-center gap-4">
+            <button className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-50 rounded-lg">
+              <Menu size={24} />
+            </button>
+            <h2 className="text-sm font-medium text-slate-500">
+              {location.pathname.split('/').filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' / ') || 'Dashboard'}
+            </h2>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="h-8 w-[1px] bg-slate-200 mx-2 hidden sm:block"></div>
+            <div className="flex items-center gap-2">
+              <UserIcon size={18} className="text-slate-400" />
+              <span className="text-sm font-medium text-slate-700 hidden sm:block">{user?.name}</span>
+            </div>
+          </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 p-6 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
           {children}
         </main>
       </div>

@@ -11,7 +11,9 @@ import {
   User as UserIcon, 
   Calendar,
   Tag,
-  Share2
+  Share2,
+  Clock,
+  ShieldCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -40,8 +42,9 @@ const LeadDetails = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500 text-lg">Loading lead details...</p>
+        <div className="flex flex-col items-center justify-center h-96 gap-4 animate-pulse">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-400 font-bold tracking-tight">Loading details...</p>
         </div>
       </Layout>
     );
@@ -49,115 +52,129 @@ const LeadDetails = () => {
 
   if (!lead) return null;
 
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'New': return 'bg-blue-50 text-blue-700 border-blue-100';
+      case 'Contacted': return 'bg-amber-50 text-amber-700 border-amber-100';
+      case 'Qualified': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+      case 'Lost': return 'bg-slate-50 text-slate-700 border-slate-100';
+      default: return 'bg-slate-50 text-slate-700 border-slate-100';
+    }
+  };
+
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <button
           onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors"
+          className="group inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-all active:scale-95"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
           Back to Dashboard
         </button>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-8 border-b border-gray-100 bg-gray-50/50">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-2xl font-bold">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+          {/* Header Card */}
+          <div className="p-8 md:p-12 border-b border-slate-50 bg-slate-50/30">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-indigo-100">
                   {lead.name.charAt(0)}
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{lead.name}</h1>
-                  <p className="text-gray-500 flex items-center gap-1">
-                    <Mail size={16} />
+                <div className="space-y-1">
+                  <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{lead.name}</h1>
+                  <p className="text-slate-500 font-medium flex items-center gap-2">
+                    <Mail size={16} className="text-slate-400" />
                     {lead.email}
                   </p>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <span className={`px-4 py-1 rounded-full text-sm font-semibold ${
-                  lead.status === 'New' ? 'bg-blue-100 text-blue-700' :
-                  lead.status === 'Contacted' ? 'bg-yellow-100 text-yellow-700' :
-                  lead.status === 'Qualified' ? 'bg-green-100 text-green-700' :
-                  'bg-red-100 text-red-700'
-                }`}>
+              <div className="flex flex-col md:items-end gap-3">
+                <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm ${getStatusStyle(lead.status)}`}>
                   {lead.status}
                 </span>
-                <p className="text-sm text-gray-500">
-                  Last updated {new Date(lead.updatedAt).toLocaleDateString()}
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                  <Clock size={14} />
+                  Updated {new Date(lead.updatedAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-8">
-              <section>
-                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+          {/* Details Grid */}
+          <div className="p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="space-y-10">
+              <section className="space-y-6">
+                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                   <Tag size={16} />
-                  Lead Source Information
+                  Source Information
                 </h2>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <span className="text-gray-600 font-medium">Primary Source</span>
-                    <span className="text-gray-900 font-bold">{lead.source}</span>
+                  <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-indigo-100 transition-colors">
+                    <span className="text-sm font-semibold text-slate-500">Primary Channel</span>
+                    <span className="text-sm font-bold text-slate-900">{lead.source}</span>
                   </div>
+                  
                   {lead.website && (
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="text-gray-600 font-medium flex items-center gap-2">
-                        <Globe size={18} />
+                    <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-indigo-100 transition-colors">
+                      <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                        <Globe size={18} className="text-slate-400 group-hover:text-indigo-500" />
                         Website
                       </span>
                       <a 
                         href={lead.website} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-indigo-600 hover:underline font-medium"
+                        className="text-sm font-bold text-indigo-600 hover:underline underline-offset-4"
                       >
-                        Visit Site
+                        Visit Link
                       </a>
                     </div>
                   )}
+
                   {lead.instagram && (
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="text-gray-600 font-medium flex items-center gap-2">
-                        <Instagram size={18} />
+                    <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-indigo-100 transition-colors">
+                      <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                        <Instagram size={18} className="text-slate-400 group-hover:text-pink-500" />
                         Instagram
                       </span>
-                      <span className="text-gray-900 font-medium">{lead.instagram}</span>
+                      <span className="text-sm font-bold text-slate-900">{lead.instagram}</span>
                     </div>
                   )}
+
                   {lead.referral && (
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="text-gray-600 font-medium flex items-center gap-2">
-                        <Share2 size={18} />
+                    <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-indigo-100 transition-colors">
+                      <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                        <Share2 size={18} className="text-slate-400 group-hover:text-emerald-500" />
                         Referred By
                       </span>
-                      <span className="text-gray-900 font-medium">{lead.referral}</span>
+                      <span className="text-sm font-bold text-slate-900">{lead.referral}</span>
                     </div>
                   )}
                 </div>
               </section>
             </div>
 
-            <div className="space-y-8">
-              <section>
-                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <UserIcon size={16} />
-                  Administrative Details
+            <div className="space-y-10">
+              <section className="space-y-6">
+                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <ShieldCheck size={16} />
+                  Internal Info
                 </h2>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <span className="text-gray-600 font-medium">Created By</span>
-                    <span className="text-gray-900 font-medium">{lead.createdBy.name}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <span className="text-gray-600 font-medium flex items-center gap-2">
-                      <Calendar size={18} />
-                      Created On
+                  <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                      <UserIcon size={18} className="text-slate-400" />
+                      Assigned To
                     </span>
-                    <span className="text-gray-900 font-medium">
+                    <span className="text-sm font-bold text-slate-900">{lead.createdBy.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                      <Calendar size={18} className="text-slate-400" />
+                      Created Date
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">
                       {new Date(lead.createdAt).toLocaleDateString(undefined, {
                         year: 'numeric',
                         month: 'long',
