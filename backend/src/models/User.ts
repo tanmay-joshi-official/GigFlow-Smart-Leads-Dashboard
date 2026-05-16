@@ -1,7 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const userSchema = new mongoose.Schema(
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  password?: string;
+  role: 'Admin' | 'Sales User';
+  matchPassword(enteredPassword: string): Promise<boolean>;
+}
+
+const userSchema = new mongoose.Schema<IUser>(
   {
     name: {
       type: String,
@@ -34,20 +42,20 @@ const userSchema = new mongoose.Schema(
 );
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
+userSchema.pre<IUser>('save', async function (next) {
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password!, salt);
 });
 
 // Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function (enteredPassword: string) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(enteredPassword, this.password!);
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model<IUser>('User', userSchema);
 
 export default User;
