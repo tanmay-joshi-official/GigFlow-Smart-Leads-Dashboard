@@ -5,7 +5,6 @@ import {
   LayoutDashboard, 
   LogOut, 
   Menu, 
-  X,
   ChevronLeft,
   ChevronRight,
   User as UserIcon
