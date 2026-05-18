@@ -123,9 +123,6 @@ docker compose up --build
 ## Deployment
 
 - **Frontend**: Deploy on Vercel.
-- **Backend**: Deploy on Render or Heroku.
+- **Backend**: Deploy on Render.
 - **Database**: Use MongoDB Atlas.
 
-## License
-
-MIT
